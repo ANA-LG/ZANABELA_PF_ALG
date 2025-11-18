@@ -11,7 +11,9 @@ ENDCLASS.
 
 
 
-CLASS zcl_fill_status_prioridad_alg IMPLEMENTATION.
+CLASS ZCL_FILL_STATUS_PRIORIDAD_ALG IMPLEMENTATION.
+
+
   METHOD if_oo_adt_classrun~main.
 
     DELETE FROM zdt_priority_alg.
@@ -48,5 +50,4 @@ CLASS zcl_fill_status_prioridad_alg IMPLEMENTATION.
 
 
   ENDMETHOD.
-
 ENDCLASS.
