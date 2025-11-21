@@ -1,10 +1,11 @@
-@EndUserText.label: 'Paremetro Cambio de Status'
+@EndUserText.label: 'Parámetro Cambio de Status'
 define abstract entity ZDD_NUEVO_STATUS_PARAM_ALG
   //  with parameters parameter_name : parameter_type
 {
   @EndUserText.label: 'Cambiar Status'
   @Consumption.valueHelpDefinition: [ {
       entity.name: 'zdd_status_vh_alg',
+//      entity.name: 'ZDD_STATUS_VH_ALG',
       entity.element: 'StatusCode',
       useForValidation: true
     } ]

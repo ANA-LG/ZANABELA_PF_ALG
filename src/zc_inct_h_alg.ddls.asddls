@@ -1,6 +1,6 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @EndUserText.label: 'Consumption View History Incident'
-@Metadata.ignorePropagatedAnnotations: true
+//@Metadata.ignorePropagatedAnnotations: true
 @Metadata.allowExtensions: true
 define view entity ZC_INCT_H_ALG 
 as projection on ZDD_INCT_H_ALG

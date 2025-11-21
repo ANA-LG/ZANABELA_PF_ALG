@@ -32,17 +32,17 @@ CLASS ZCL_FILL_STATUS_PRIORIDAD_ALG IMPLEMENTATION.
 
 ****   ----Status value
      INSERT zdt_status_alg FROM TABLE @( VALUE #( ( status_code = 'OP'
-                                                   status_description = 'Open' )
+                                                   status_description = 'Open-ALG' )
                                                  ( status_code = 'IP'
-                                                   status_description = 'In Progress' )
+                                                   status_description = 'In Progress-ALG' )
                                                  ( status_code = 'PE'
-                                                   status_description = 'Pending' )
+                                                   status_description = 'Pending-ALG' )
                                                  ( status_code = 'CO'
-                                                   status_description = 'Completed' )
+                                                   status_description = 'Completed-ALG' )
                                                  ( status_code = 'CL'
-                                                   status_description = 'Closed' )
+                                                   status_description = 'Closed-ALG' )
                                                  ( status_code = 'CN'
-                                                   status_description = 'Canceled' ) ) ).
+                                                   status_description = 'Canceled-ALG' ) ) ).
     IF sy-subrc EQ 0.
       out->write( |{ sy-dbcnt } Status agregados correctamente| ).
     ENDIF.

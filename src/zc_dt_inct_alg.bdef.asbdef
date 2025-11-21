@@ -1,4 +1,5 @@
-projection implementation in class zbp_c_dt_inct_alg unique;
+//projection implementation in class zbp_c_dt_inct_alg unique;
+projection;
 strict ( 2 );
 use draft;
 use side effects;
@@ -9,21 +10,23 @@ use etag
   use update;
   use delete;
 
+  use action changeStatus;
+
   use action Resume;
   use action Edit;
   use action Activate;
   use action Discard;
   use action Prepare;
-  use action changeStatus;
 
-  use association _History { create; }
+
+  use association _History { create; with draft; }
 }
 
 define behavior for ZC_INCT_H_ALG alias History
-use etag
+//use etag
 {
-  use update;
-  use delete;
+//  use update;
+//  use delete;
 
   use association _Incident { with draft; }
 }

@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <T100A>
+    <ARBGB>ZMC_MESSAGE_INCI_ALG</ARBGB>
+    <MASTERLANG>E</MASTERLANG>
+    <STEXT>Message class - Incident</STEXT>
+   </T100A>
+   <T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INCI_ALG</ARBGB>
+     <MSGNR>001</MSGNR>
+     <TEXT>Status &amp;1 is not valid.  Pending (PE) can´t change to CO or CL Status</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INCI_ALG</ARBGB>
+     <MSGNR>002</MSGNR>
+     <TEXT>Ingresa el Título del incidente</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INCI_ALG</ARBGB>
+     <MSGNR>003</MSGNR>
+     <TEXT>Ingresa la descripcion del incidente</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INCI_ALG</ARBGB>
+     <MSGNR>004</MSGNR>
+     <TEXT>Ingresa la prioridad del inicidente</TEXT>
+    </T100>
+   </T100>
+  </asx:values>
+ </asx:abap>
+</abapGit>

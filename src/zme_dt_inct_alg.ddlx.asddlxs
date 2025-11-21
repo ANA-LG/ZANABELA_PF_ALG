@@ -37,7 +37,7 @@ annotate entity ZC_DT_INCT_ALG with
                      label: 'IncUUID' },
                { type: #FOR_ACTION,
                  dataAction: 'changeStatus',
-                 label: 'Change Status',
+                 label: 'cambia - Status',
                  position: 10 } ],
   selectionField: [{ position: 10 }]}
   IncUUID;

@@ -1,26 +1,28 @@
-//managed implementation in class zbp_r_dt_inct_alg unique;
-managed;
+managed implementation in class zbp_r_dt_inct_alg unique;
+
 strict ( 2 );
 with draft;
 
 define behavior for ZR_DT_INCT_ALG alias Incident //alias <alias_name>
 implementation in class zbp_r_dt_inct_alg unique
+
 persistent table zdt_inct_alg
 draft table zdt_inct_algd
-etag master localLastChangedAt
+
 lock master total etag lastChangedAt
+etag master localLastChangedAt
 authorization master ( global, instance )
+
 {
-//  create ( authorization : global );
-  create ;
+  create ( authorization : global );
   update;
   delete;
+
   field ( readonly )
-  IncUUID,
   IncidentID,
-  Status,
+  //  Status,
+  CreationDate,
   ChangedDate,
-  LocalCreatedBy,
   LocalCreatedAt,
   LocalLastChangedBy,
   LocalLastChangedAt,
@@ -29,28 +31,50 @@ authorization master ( global, instance )
   //  association _History { create; }
   association _History { create ( features : instance ); with draft; }
 
-  field ( numbering : managed )
-  IncUUID;
+  field ( numbering : managed, readonly ) IncUUID;
+
 
   field ( mandatory )
   title,
   Description,
   Priority;
+
+  //Accion que vincula el campo con la entidad abstracta
   action ( features : instance, authorization : update ) changeStatus
     parameter ZDD_NUEVO_STATUS_PARAM_ALG result [1] $self;
 
-  side effects { action changeStatus affects $self; }
+  //  side effects { action changeStatus affects $self; }
 
   internal action setHistory;
 
   determination setDefaultHistory on save { create; }
-
   determination setDefaultValues on modify { create; }
+
+
+  validation validateTitle on save { create; update; field Title; }
+  validation validateDescription on save { create; update; field Description; }
+  validation validateStatus on save { create; update; field Status; }
+  validation validatePriority on save { create; update; field Priority; }
+
+  determine action validateTitlet { validation validateTitle; }
+  determine action validateDescriptiont { validation validateDescription; }
+  determine action validateStatus_code { validation validateStatus; }
+  determine action validatePriority_code { validation validatePriority; }
+
+  side effects
+  {
+    action changeStatus affects messages, $self;
+    determine action validateTitlet executed on field Title affects messages;
+    determine action validateDescriptiont executed on field Description affects messages;
+    determine action validateStatus_code executed on field Status affects messages;
+  }
+
 
   draft action Activate optimized;
   draft action Discard;
   draft action Edit;
   draft action Resume;
+
   draft determine action Prepare;
 
   mapping for zdt_inct_alg
@@ -72,7 +96,7 @@ authorization master ( global, instance )
 }
 
 define behavior for ZDD_INCT_H_ALG alias History //alias <alias_name>
-implementation in class zbp_dd_inct_h_alg unique
+//implementation in class zbp_dd_inct_h_alg unique
 persistent table zdt_inct_h_alg
 draft table zdt_inct_h_algd
 lock dependent by _Incident
@@ -93,9 +117,9 @@ etag master LocalLastChangedAt
   field ( numbering : managed )
   HisUUID;
 
-  association _Incident {with draft;}
+  association _Incident { with draft; }
 
-    mapping for zdt_inct_h_alg
+  mapping for zdt_inct_h_alg
     {
       HisUUID            = his_uuid;
       IncUUID            = inc_uuid;

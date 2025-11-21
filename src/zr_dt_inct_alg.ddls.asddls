@@ -1,6 +1,7 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @EndUserText.label: 'Root View Incidents'
-@Metadata.ignorePropagatedAnnotations: true
+//@Metadata.ignorePropagatedAnnotations: true
+@Metadata.allowExtensions: true
 define root view entity ZR_DT_INCT_ALG
   as select from zdt_inct_alg
   composition [0..*] of ZDD_INCT_H_ALG as _History

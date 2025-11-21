@@ -1,12 +1,12 @@
 CLASS lhc_Incident DEFINITION INHERITING FROM cl_abap_behavior_handler.
-pubLIC SECTION.
-CONSTANTS: BEGIN OF mc_status,
-                 open        TYPE zde_status2_lgl VALUE 'OP',
-                 in_progress TYPE zde_status2_lgl VALUE 'IP',
-                 pending     TYPE zde_status2_lgl VALUE 'PE',
-                 completed   TYPE zde_status2_lgl VALUE 'CO',
-                 closed      TYPE zde_status2_lgl VALUE 'CL',
-                 canceled    TYPE zde_status2_lgl VALUE 'CN',
+  PUBLIC SECTION.
+    CONSTANTS: BEGIN OF mc_status,
+                 open        TYPE zde_status_code_alg VALUE 'OP',
+                 in_progress TYPE zde_status_code_alg VALUE 'IP',
+                 pending     TYPE zde_status_code_alg VALUE 'PE',
+                 completed   TYPE zde_status_code_alg VALUE 'CO',
+                 closed      TYPE zde_status_code_alg VALUE 'CL',
+                 canceled    TYPE zde_status_code_alg VALUE 'CN',
                END OF mc_status.
 
   PRIVATE SECTION.
@@ -33,13 +33,29 @@ CONSTANTS: BEGIN OF mc_status,
       IMPORTING keys FOR Incident~setDefaultHistory.
 
     METHODS get_history EXPORTING ev_incuuid      TYPE sysuuid_x16
-                              RETURNING VALUE(rv_index) TYPE zde_his_id_alg.
+                        RETURNING VALUE(rv_index) TYPE zde_his_id_alg.
+
+    METHODS validateTitlet FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Incident~validateTitle.
+
+    METHODS    validateDescriptiont FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Incident~validateDescription.
+
+    METHODS validatePriority_code FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Incident~validatePriority.
+
+    METHODS validateStatus_code FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Incident~validateStatus.
+
+
+
 ENDCLASS.
 
 CLASS lhc_Incident IMPLEMENTATION.
 
   METHOD get_instance_features.
     DATA lv_history_index TYPE zde_his_id_alg.
+
     READ ENTITIES OF zr_dt_inct_alg IN LOCAL MODE
        ENTITY Incident
          FIELDS ( Status )
@@ -64,12 +80,12 @@ CLASS lhc_Incident IMPLEMENTATION.
                                                              THEN if_abap_behv=>fc-o-disabled
                                                              ELSE if_abap_behv=>fc-o-enabled )
 
-                            %assoc-_History       = COND #( WHEN incident-Status = mc_status-completed OR
-                                                                 incident-Status = mc_status-closed    OR
-                                                                 incident-Status = mc_status-canceled  OR
-                                                                 lv_history_index = 0
-                                                            THEN if_abap_behv=>fc-o-disabled
-                                                            ELSE if_abap_behv=>fc-o-enabled )
+*                            %assoc-_History       = COND #( WHEN incident-Status = mc_status-completed OR
+*                                                                 incident-Status = mc_status-closed    OR
+*                                                                 incident-Status = mc_status-canceled  OR
+*                                                                 lv_history_index = 0
+*                                                            THEN if_abap_behv=>fc-o-disabled
+*                                                            ELSE if_abap_behv=>fc-o-enabled )
                           ) ).
   ENDMETHOD.
 
@@ -80,12 +96,7 @@ CLASS lhc_Incident IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD changeStatus.
-***Lectura del codigo fuente
-*    READ ENTITIES OF zr_dt_inct_alg IN LOCAL MODE
-*         ENTITY Incident
-*         ALL FIELDS WITH CORRESPONDING #( keys )
-*         RESULT DATA(incidents)
-*         FAILED failed.
+
     DATA: lt_updated_root_entity TYPE TABLE FOR UPDATE zr_dt_inct_alg,
           lt_association_entity  TYPE TABLE FOR CREATE zr_dt_inct_alg\_History,
           lv_status              TYPE zde_status_code_alg,
@@ -96,16 +107,17 @@ CLASS lhc_Incident IMPLEMENTATION.
           lv_max_his_id          TYPE zde_his_id_alg,
           lv_wrong_status        TYPE zde_status_code_alg.
 
-** Iterate through the keys records to get parameters for validations
+**Lectura del codigo fuente
     READ ENTITIES OF zr_dt_inct_alg IN LOCAL MODE
          ENTITY Incident
          ALL FIELDS WITH CORRESPONDING #( keys )
          RESULT DATA(incidents)
          FAILED failed.
 
+
 ** Get parameters
     LOOP AT incidents ASSIGNING FIELD-SYMBOL(<incident>).
-** Get Status
+** Lectura del status
       lv_status = keys[ KEY id %tky = <incident>-%tky ]-%param-status.
 
 **  It is not possible to change the pending (PE) to Completed (CO) or Closed (CL) status
@@ -117,7 +129,7 @@ CLASS lhc_Incident IMPLEMENTATION.
         lv_wrong_status = lv_status.
 * Customize error messages
         APPEND VALUE #( %tky = <incident>-%tky
-                        %msg = NEW zcl_incident_messages_lgl( textid = zcl_incident_messages_lgl=>status_invalid
+                                %msg = NEW zcl_messages_incident_alg( textid = zcl_messages_incident_alg=>status_invalid
                                                             status = lv_wrong_status
                                                             severity = if_abap_behv_message=>severity-error )
                         %state_area = 'VALIDATE_COMPONENT'
@@ -206,6 +218,58 @@ CLASS lhc_Incident IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD setHistory.
+    DATA: lt_updated_root_entity TYPE TABLE FOR UPDATE zr_dt_inct_alg,
+          lt_association_entity  TYPE TABLE FOR CREATE zr_dt_inct_alg\_History,
+          lv_exception           TYPE string,
+          ls_incident_history    TYPE zdt_inct_h_alg,
+          lv_max_his_id          TYPE zde_his_id_alg.
+
+
+    READ ENTITIES OF zr_dt_inct_alg IN LOCAL MODE
+         ENTITY Incident
+         ALL FIELDS WITH CORRESPONDING #( keys )
+         RESULT DATA(incidents).
+
+    LOOP AT incidents ASSIGNING FIELD-SYMBOL(<incident>).
+      lv_max_his_id = get_history( IMPORTING ev_incuuid = <incident>-IncUUID ).
+
+      IF lv_max_his_id IS INITIAL.
+        ls_incident_history-his_id = 1.
+      ELSE.
+        ls_incident_history-his_id = lv_max_his_id + 1.
+      ENDIF.
+
+      TRY.
+          ls_incident_history-inc_uuid = cl_system_uuid=>create_uuid_x16_static( ).
+        CATCH cx_uuid_error INTO DATA(lo_error).
+          lv_exception = lo_error->get_text(  ).
+      ENDTRY.
+
+      IF ls_incident_history-his_id IS NOT INITIAL.
+        APPEND VALUE #( %tky = <incident>-%tky
+                        %target = VALUE #( (  HisUUID = ls_incident_history-inc_uuid
+                                              IncUUID = <incident>-IncUUID
+                                              HisID = ls_incident_history-his_id
+                                              NewStatus = <incident>-Status
+                                              Text = | Creación - { <incident>-Description }| ) )
+                                               ) TO lt_association_entity.
+      ENDIF.
+    ENDLOOP.
+    UNASSIGN <incident>.
+
+    FREE incidents.
+
+    MODIFY ENTITIES OF zr_dt_inct_alg IN LOCAL MODE
+     ENTITY Incident
+     CREATE BY \_History FIELDS ( HisUUID
+                                  IncUUID
+                                  HisID
+                                  PreviousStatus
+                                  NewStatus
+                                  Text )
+        AUTO FILL CID
+        WITH lt_association_entity.
+
   ENDMETHOD.
 
   METHOD setDefaultValues.
@@ -246,13 +310,14 @@ CLASS lhc_Incident IMPLEMENTATION.
                                                  Status       = mc_status-open )  ).
   ENDMETHOD.
 
-  METHOD setDefaultHistory.
 
+  METHOD setDefaultHistory.
     MODIFY ENTITIES OF zr_dt_inct_alg IN LOCAL MODE
     ENTITY Incident
     EXECUTE setHistory
        FROM CORRESPONDING #( keys ).
   ENDMETHOD.
+
 
   METHOD get_history.
     SELECT FROM zdt_inct_h_alg
@@ -260,6 +325,65 @@ CLASS lhc_Incident IMPLEMENTATION.
       WHERE inc_uuid EQ @ev_incuuid AND
             his_uuid IS NOT NULL
       INTO @rv_index.
+  ENDMETHOD.
+
+
+  METHOD validateDescriptiont.
+    READ ENTITIES OF zr_dt_inct_alg IN LOCAL MODE
+            ENTITY Incident
+              FIELDS ( Description ) WITH CORRESPONDING #( keys )
+            RESULT DATA(Incidents).
+    LOOP AT Incidents INTO DATA(incident).
+      IF Incident-description IS INITIAL.
+        APPEND VALUE #( %tky = incident-%tky ) TO failed-incident.
+        APPEND VALUE #( %tky = incident-%tky
+                        %msg = NEW zcl_messages_incident_alg( textid = zcl_messages_incident_alg=>description_empty
+                                                            description = incident-Description
+                                                            severity = if_abap_behv_message=>severity-error  )
+                                                           %element-Description = if_abap_behv=>mk-on ) TO reported-incident.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD validatepriority_code.
+    READ ENTITIES OF zr_dt_inct_alg IN LOCAL MODE
+             ENTITY Incident
+               FIELDS ( Priority ) WITH CORRESPONDING #( keys )
+             RESULT DATA(Incidents).
+    LOOP AT Incidents INTO DATA(incident).
+      IF Incident-priority IS INITIAL.
+        APPEND VALUE #( %tky = incident-%tky ) TO failed-incident.
+        APPEND VALUE #( %tky = incident-%tky
+                        %msg = NEW zcl_messages_incident_alg( textid = zcl_messages_incident_alg=>priority_empty
+                                                            priority = incident-Priority
+                                                            severity = if_abap_behv_message=>severity-error  )
+                                                            %element-Priority = if_abap_behv=>mk-on ) TO reported-incident.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+
+  METHOD validatetitlet.
+    READ ENTITIES OF zr_dt_inct_alg IN LOCAL MODE
+         ENTITY Incident
+           FIELDS ( Title ) WITH CORRESPONDING #( keys )
+         RESULT DATA(Incidents).
+
+    LOOP AT Incidents INTO DATA(incident).
+      IF Incident-title IS INITIAL.
+        APPEND VALUE #( %tky = incident-%tky ) TO failed-incident.
+        APPEND VALUE #( %tky = incident-%tky
+                        %msg = NEW zcl_messages_incident_alg( textid = zcl_messages_incident_alg=>title_empty
+                                                            title = incident-Title
+                                                            severity = if_abap_behv_message=>severity-error  )
+                                                            %element-Title = if_abap_behv=>mk-on ) TO reported-incident.
+
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD validatestatus_code.
   ENDMETHOD.
 
 ENDCLASS.
