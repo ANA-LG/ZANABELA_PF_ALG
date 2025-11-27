@@ -47,6 +47,9 @@ CLASS lhc_Incident DEFINITION INHERITING FROM cl_abap_behavior_handler.
     METHODS validateStatus_code FOR VALIDATE ON SAVE
       IMPORTING keys FOR Incident~validateStatus.
 
+*    METHODS validateStatusO FOR VALIDATE ON SAVE
+*      IMPORTING keys FOR Incident~validateStatusO.
+
 
 
 ENDCLASS.
@@ -172,7 +175,10 @@ CLASS lhc_Incident IMPLEMENTATION.
                                               HisID = ls_incident_history-his_id
                                               PreviousStatus = <incident>-Status
                                               NewStatus = ls_incident_history-new_status
-                                              Text = ls_incident_history-text ) )
+                                              Text = ls_incident_history-text
+                                              CreationDate = cl_abap_context_info=>get_system_date( )
+
+                                              ) )
                                                ) TO lt_association_entity.
       ENDIF.
     ENDLOOP.
@@ -197,7 +203,9 @@ CLASS lhc_Incident IMPLEMENTATION.
                                   HisID
                                   PreviousStatus
                                   NewStatus
-                                  Text )
+                                  Text
+                                  CreationDate
+                                   )
         AUTO FILL CID
         WITH lt_association_entity
      MAPPED mapped
@@ -266,7 +274,8 @@ CLASS lhc_Incident IMPLEMENTATION.
                                   HisID
                                   PreviousStatus
                                   NewStatus
-                                  Text )
+                                  Text
+                                  CreationDate )
         AUTO FILL CID
         WITH lt_association_entity.
 
@@ -324,7 +333,8 @@ CLASS lhc_Incident IMPLEMENTATION.
       FIELDS MAX( his_id ) AS max_his_id
       WHERE inc_uuid EQ @ev_incuuid AND
             his_uuid IS NOT NULL
-      INTO @rv_index.
+      INTO @rv_index
+      .
   ENDMETHOD.
 
 
@@ -384,6 +394,27 @@ CLASS lhc_Incident IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD validatestatus_code.
+
   ENDMETHOD.
+
+*  METHOD validateStatusO.
+*
+*   READ ENTITIES OF zr_dt_inct_alg IN LOCAL MODE
+*         ENTITY Incident
+*           FIELDS ( Status ) WITH CORRESPONDING #( keys )
+*         RESULT DATA(Incidents).
+*
+*    LOOP AT Incidents INTO DATA(incident).
+*      IF Incident-Status NE mc_status-OPEN.
+*        APPEND VALUE #( %tky = incident-%tky ) TO failed-incident.
+*        APPEND VALUE #( %tky = incident-%tky
+*                        %msg = NEW zcl_messages_incident_alg( textid = zcl_messages_incident_alg=>status_init_open
+*                                                            status = incident-Status
+*                                                            severity = if_abap_behv_message=>severity-error  )
+*                                                            %element-Status = if_abap_behv=>mk-on ) TO reported-incident.
+*
+*      ENDIF.
+*    ENDLOOP.
+*  ENDMETHOD.
 
 ENDCLASS.

@@ -51,7 +51,16 @@ CLASS zcl_messages_incident_alg DEFINITION
         attr2 TYPE scx_attrname VALUE '',
         attr3 TYPE scx_attrname VALUE '',
         attr4 TYPE scx_attrname VALUE '',
-      END OF priority_empty.
+      END OF priority_empty,
+
+       BEGIN OF status_init_open,
+        msgid TYPE symsgid VALUE 'ZMC_MESSAGE_INCI_ALG',
+        msgno TYPE symsgno VALUE '005',
+        attr1 TYPE scx_attrname VALUE 'MV_STATUSO',
+        attr2 TYPE scx_attrname VALUE '',
+        attr3 TYPE scx_attrname VALUE '',
+        attr4 TYPE scx_attrname VALUE '',
+      END OF status_init_open.
 
 
     METHODS constructor

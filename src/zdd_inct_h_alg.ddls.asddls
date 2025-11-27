@@ -19,6 +19,7 @@ define view entity ZDD_INCT_H_ALG
       previous_status       as PreviousStatus,
       new_status            as NewStatus,
       text                  as Text,
+      creation_date         as CreationDate,
       local_created_by      as LocalCreatedBy,
       local_created_at      as LocalCreatedAt,
       local_last_changed_at as LocalLastChangedAt,

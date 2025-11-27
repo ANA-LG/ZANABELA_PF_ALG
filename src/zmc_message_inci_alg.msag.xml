@@ -32,6 +32,12 @@
      <MSGNR>004</MSGNR>
      <TEXT>Ingresa la prioridad del inicidente</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZMC_MESSAGE_INCI_ALG</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>El status inicial debe ser Open</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

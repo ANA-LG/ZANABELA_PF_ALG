@@ -49,17 +49,20 @@ authorization master ( global, instance )
 
   determination setDefaultHistory on save { create; }
   determination setDefaultValues on modify { create; }
+//  determination setDefaultValues on save { create; }
 
 
   validation validateTitle on save { create; update; field Title; }
   validation validateDescription on save { create; update; field Description; }
-  validation validateStatus on save { create; update; field Status; }
   validation validatePriority on save { create; update; field Priority; }
+  validation validateStatus on save { create; update; field Status; }
+//  validation validateStatusO on save { create; field Status; }
 
   determine action validateTitlet { validation validateTitle; }
   determine action validateDescriptiont { validation validateDescription; }
-  determine action validateStatus_code { validation validateStatus; }
   determine action validatePriority_code { validation validatePriority; }
+  determine action validateStatus_code { validation validateStatus; }
+//  determine action validateStatus_O { validation validateStatusO; }
 
   side effects
   {
@@ -67,6 +70,7 @@ authorization master ( global, instance )
     determine action validateTitlet executed on field Title affects messages;
     determine action validateDescriptiont executed on field Description affects messages;
     determine action validateStatus_code executed on field Status affects messages;
+//    determine action validateStatus_O executed on field Status affects messages;
   }
 
 
@@ -96,7 +100,7 @@ authorization master ( global, instance )
 }
 
 define behavior for ZDD_INCT_H_ALG alias History //alias <alias_name>
-//implementation in class zbp_dd_inct_h_alg unique
+implementation in class zbp_dd_inct_h_alg unique
 persistent table zdt_inct_h_alg
 draft table zdt_inct_h_algd
 lock dependent by _Incident
@@ -117,6 +121,7 @@ etag master LocalLastChangedAt
   field ( numbering : managed )
   HisUUID;
 
+  //  association _Incident { with draft; }
   association _Incident { with draft; }
 
   mapping for zdt_inct_h_alg
@@ -127,6 +132,7 @@ etag master LocalLastChangedAt
       PreviousStatus     = previous_status;
       NewStatus          = new_status;
       Text               = text;
+      CreationDate       = creation_date;
       LocalCreatedBy     = local_created_by;
       LocalCreatedAt     = local_created_at;
       LocalLastChangedBy = local_last_changed_by;

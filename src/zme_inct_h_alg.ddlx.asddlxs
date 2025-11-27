@@ -5,8 +5,9 @@
                      title:          { type: #STANDARD,
                                        label: 'History',
                                        value: 'HisID' } },
-       presentationVariant: [{ sortOrder: [{ by: 'NewStatus',
-                                          direction: #DESC } ],
+//       presentationVariant: [{ sortOrder: [{ by: 'NewStatus',
+       presentationVariant: [{ sortOrder: [{ by: 'HisID',
+                                          direction: #ASC  } ],
        visualizations: [{ type: #AS_LINEITEM}]}] }
 annotate entity ZC_INCT_H_ALG with
 {
@@ -35,6 +36,11 @@ annotate entity ZC_INCT_H_ALG with
   @UI: { lineItem:       [ { position: 60, importance: #LOW } ],
          identification: [ { position: 60 } ] }
   Text;
+
+  @EndUserText.label: 'Created Date History'
+  @UI: { lineItem:       [ { position: 70, importance: #LOW } ],
+         identification: [ { position: 70 } ] }
+  CreationDate;
   @UI.hidden:true
   LocalCreatedBy;
   @UI.hidden:true
@@ -42,8 +48,10 @@ annotate entity ZC_INCT_H_ALG with
   @UI.hidden:true
   LocalLastChangedBy;
   @UI.hidden:true
+
   LocalLastChangedAt;
   @UI.hidden:true
+
   LastChangedAt;
   @UI.hidden: true
   _Incident;

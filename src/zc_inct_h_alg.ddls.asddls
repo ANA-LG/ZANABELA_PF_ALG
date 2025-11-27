@@ -11,6 +11,7 @@ as projection on ZDD_INCT_H_ALG
     PreviousStatus,
     NewStatus,
     Text,
+    CreationDate,
     LocalCreatedBy,
     LocalCreatedAt,
     LocalLastChangedAt,
